@@ -1,0 +1,51 @@
+alias: Nightlight Pink - Ramp Down
+sequence:
+  - variables:
+      start_brightness: 255
+      end_brightness: 63
+      brightness_increments: 5
+      duration_mins: 285
+      repeat_count: "{{ ((start_brightness - end_brightness) / brightness_increments) }}"
+      repeat_delay: "{{ ((duration_mins * 60) / repeat_count) }}"
+  - service: light.turn_on
+    data:
+      color_name: magenta
+      brightness: "{{ start_brightness }}"
+    target:
+      entity_id: light.night_light_bulb
+  - service: light.turn_on
+    data:
+      color_name: crimson
+      brightness: "{{ start_brightness }}"
+    target:
+      entity_id: light.night_lamp
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.flexlight_pink
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: "{{ repeat_delay | int }} "
+      milliseconds: 0
+  - repeat:
+      while:
+        - condition: template
+          value_template: >-
+            {{ (state_attr('light.night_light_group', 'brightness') >
+            end_brightness) }}
+      sequence:
+        - service: light.turn_on
+          data:
+            brightness: >-
+              {{ state_attr('light.night_light_group', 'brightness') | int -
+              brightness_increments }}
+          entity_id:
+            - light.night_light_group
+        - delay:
+            hours: 0
+            minutes: 0
+            seconds: "{{ repeat_delay | int }} "
+            milliseconds: 0
+mode: restart
+icon: mdi:lightbulb
