@@ -1,28 +1,24 @@
 alias: Nightlight Pink - Ramp Down
 sequence:
   - variables:
+#     starting light brightness. 0-255. (255=100%)  
       start_brightness: 255
+#     end light brightness. 0-255      
       end_brightness: 63
+#     increment to change brightness by... ie: when set to 5 it will go 255->250->245
       brightness_increments: 5
+#     duration in minutes to dim light
       duration_mins: 285
+#     use this variables when dimming lights down
       repeat_count: "{{ ((start_brightness - end_brightness) / brightness_increments) }}"
+#     use this variables when increasing light brightness
+#      repeat_count: "{{ ((end_brightness - start_brightness) / brightness_increments) }}"
       repeat_delay: "{{ ((duration_mins * 60) / repeat_count) }}"
   - service: light.turn_on
     data:
-      color_name: magenta
       brightness: "{{ start_brightness }}"
     target:
-      entity_id: light.night_light_bulb
-  - service: light.turn_on
-    data:
-      color_name: crimson
-      brightness: "{{ start_brightness }}"
-    target:
-      entity_id: light.night_lamp
-  - service: input_boolean.turn_on
-    data: {}
-    target:
-      entity_id: input_boolean.flexlight_pink
+      entity_id: light.night_light_group
   - delay:
       hours: 0
       minutes: 0
@@ -31,15 +27,25 @@ sequence:
   - repeat:
       while:
         - condition: template
+#         use this when dimming the lights down
           value_template: >-
             {{ (state_attr('light.night_light_group', 'brightness') >
             end_brightness) }}
+#         Uncomment and use this formula to increase the brightness of the lights (IE: For a wake-up light routine)
+#          value_template: >-
+#            {{ (state_attr('light.night_light_group', 'brightness') <
+#            end_brightness) }}            
       sequence:
         - service: light.turn_on
           data:
+#           Use this formula when dimming lights down        
             brightness: >-
               {{ state_attr('light.night_light_group', 'brightness') | int -
               brightness_increments }}
+#            Uncomment and use this formula when increasing light brightness
+#            brightness: >-
+#              {{ state_attr('light.night_light_group', 'brightness') | int +
+#              brightness_increments }}
           entity_id:
             - light.night_light_group
         - delay:
