@@ -11,7 +11,7 @@ sequence:
       duration_mins: 285
 #     use this variables when dimming lights down
       repeat_count: "{{ ((start_brightness - end_brightness) / brightness_increments) }}"
-#     use this variables when increasing light brightness
+#     uncomment and use this variables when increasing light brightness
 #      repeat_count: "{{ ((end_brightness - start_brightness) / brightness_increments) }}"
       repeat_delay: "{{ ((duration_mins * 60) / repeat_count) }}"
   - service: light.turn_on
