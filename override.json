@@ -1,4 +1,5 @@
-[
+{
+  "VZM31-SN": [
     {
         "fileVersion": 16908815,
         "channel": "beta",
@@ -7,4 +8,5 @@
         "image_type": 257
         "force": true
     }
-]
+  ]
+}
